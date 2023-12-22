@@ -1,7 +1,7 @@
 import SwiftSyntax
 import XCTest
 
-@testable import SpyableMacro
+@testable import StubMacro
 
 final class UT_Extractor: XCTestCase {
   func testExtractProtocolDeclarationSuccessfully() throws {
@@ -26,7 +26,7 @@ final class UT_Extractor: XCTestCase {
     XCTAssertThrowsError(_ = try Extractor().extractProtocolDeclaration(from: declaration)) {
       receivedError = $0
     }
-    let unwrappedReceivedError = try XCTUnwrap(receivedError as? SpyableDiagnostic)
+    let unwrappedReceivedError = try XCTUnwrap(receivedError as? StubDiagnostic)
     XCTAssertEqual(unwrappedReceivedError, .onlyApplicableToProtocol)
   }
 }

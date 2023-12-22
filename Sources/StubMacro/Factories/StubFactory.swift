@@ -1,11 +1,11 @@
 import SwiftSyntax
 import SwiftSyntaxBuilder
 
-/// `SpyFactory` is a factory that creates a test spy for a given protocol. A spy is a type of test double
-/// that captures method and property interactions for later verification. The `SpyFactory` creates a new
+/// `StubFactory` is a factory that creates a test spy for a given protocol. A spy is a type of test double
+/// that captures method and property interactions for later verification. The `StubFactory` creates a new
 /// class that implements the given protocol and keeps track of interactions with its properties and methods.
 ///
-/// The `SpyFactory` utilizes several other factories, each with its own responsibilities:
+/// The `StubFactory` utilizes several other factories, each with its own responsibilities:
 ///
 /// - `VariablePrefixFactory`: It creates unique prefixes for variable names based on the function
 ///   signatures. This helps to avoid naming conflicts when creating the spy class.
@@ -28,7 +28,7 @@ import SwiftSyntaxBuilder
 ///   manipulate the corresponding variables (calls count, received arguments etc.) and then call the respective
 ///   closure if it exists.
 ///
-/// The `SpyFactory` generates the spy class by first iterating over each property in the protocol and creating
+/// The `StubFactory` generates the spy class by first iterating over each property in the protocol and creating
 /// corresponding variable declarations using the `VariablesImplementationFactory`.
 ///
 /// Next, it iterates over each method in the protocol. For each method, it uses the `VariablePrefixFactory` to
@@ -79,7 +79,7 @@ import SwiftSyntaxBuilder
 ///     }
 /// }
 /// ```
-struct SpyFactory {
+struct StubFactory {
   private let associatedtypeFactory = AssociatedtypeFactory()
   private let variablePrefixFactory = VariablePrefixFactory()
   private let variablesImplementationFactory = VariablesImplementationFactory()
@@ -93,7 +93,7 @@ struct SpyFactory {
   private let functionImplementationFactory = FunctionImplementationFactory()
 
   func classDeclaration(for protocolDeclaration: ProtocolDeclSyntax) throws -> ClassDeclSyntax {
-    let identifier = TokenSyntax.identifier(protocolDeclaration.name.text + "Spy")
+      let identifier = TokenSyntax.identifier("Stub" + protocolDeclaration.name.text.capitalizingFirstLetter())
 
     let assosciatedtypeDeclarations = protocolDeclaration.memberBlock.members.compactMap {
       $0.decl.as(AssociatedTypeDeclSyntax.self)
@@ -116,6 +116,11 @@ struct SpyFactory {
         )
       },
       memberBlockBuilder: {
+         try VariableDeclSyntax(
+            """
+            static var shared = \(identifier)()
+            """
+         )
         for variableDeclaration in variableDeclarations {
           try variablesImplementationFactory.variablesDeclarations(
             protocolVariableDeclaration: variableDeclaration

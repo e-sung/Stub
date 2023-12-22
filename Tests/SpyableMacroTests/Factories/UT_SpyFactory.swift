@@ -2,9 +2,9 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 import XCTest
 
-@testable import SpyableMacro
+@testable import StubMacro
 
-final class UT_SpyFactory: XCTestCase {
+final class UT_StubFactory: XCTestCase {
   func testDeclarationEmptyProtocol() throws {
     let declaration = DeclSyntax(
       """
@@ -13,12 +13,13 @@ final class UT_SpyFactory: XCTestCase {
     )
     let protocolDeclaration = try XCTUnwrap(ProtocolDeclSyntax(declaration))
 
-    let result = try SpyFactory().classDeclaration(for: protocolDeclaration)
+    let result = try StubFactory().classDeclaration(for: protocolDeclaration)
 
     assertBuildResult(
       result,
       """
-      class FooSpy: Foo {
+      class StubFoo: Foo {
+          static var shared = StubFoo()
       }
       """
     )
@@ -34,12 +35,13 @@ final class UT_SpyFactory: XCTestCase {
     )
     let protocolDeclaration = try XCTUnwrap(ProtocolDeclSyntax(declaration))
 
-    let result = try SpyFactory().classDeclaration(for: protocolDeclaration)
+    let result = try StubFactory().classDeclaration(for: protocolDeclaration)
 
     assertBuildResult(
       result,
       """
-      class ServiceSpy: Service {
+      class StubService: Service {
+          static var shared = StubService()
           var fetchCallsCount = 0
           var fetchCalled: Bool {
               return fetchCallsCount > 0
@@ -64,12 +66,13 @@ final class UT_SpyFactory: XCTestCase {
     )
     let protocolDeclaration = try XCTUnwrap(ProtocolDeclSyntax(declaration))
 
-    let result = try SpyFactory().classDeclaration(for: protocolDeclaration)
+    let result = try StubFactory().classDeclaration(for: protocolDeclaration)
 
     assertBuildResult(
       result,
       """
-      class ViewModelProtocolSpy: ViewModelProtocol {
+      class StubViewModelProtocol: ViewModelProtocol {
+          static var shared = StubViewModelProtocol()
           var fooTextCountCallsCount = 0
           var fooTextCountCalled: Bool {
               return fooTextCountCallsCount > 0
@@ -98,24 +101,25 @@ final class UT_SpyFactory: XCTestCase {
     )
     let protocolDeclaration = try XCTUnwrap(ProtocolDeclSyntax(declaration))
 
-    let result = try SpyFactory().classDeclaration(for: protocolDeclaration)
+    let result = try StubFactory().classDeclaration(for: protocolDeclaration)
 
     assertBuildResult(
       result,
       """
-      class BarSpy: Bar {
+      class StubBar: Bar {
+          static var shared = StubBar()
           var printCallsCount = 0
           var printCalled: Bool {
               return printCallsCount > 0
           }
-          var printReturnValue: (text: String, tuple: (count: Int?, Date))!
+          var stubbedPrint: (text: String, tuple: (count: Int?, Date))!
           var printClosure: (() -> (text: String, tuple: (count: Int?, Date)))?
           func print() -> (text: String, tuple: (count: Int?, Date)) {
               printCallsCount += 1
               if printClosure != nil {
                   return printClosure!()
               } else {
-                  return printReturnValue
+                  return stubbedPrint
               }
           }
       }
@@ -133,19 +137,20 @@ final class UT_SpyFactory: XCTestCase {
     )
     let protocolDeclaration = try XCTUnwrap(ProtocolDeclSyntax(declaration))
 
-    let result = try SpyFactory().classDeclaration(for: protocolDeclaration)
+    let result = try StubFactory().classDeclaration(for: protocolDeclaration)
 
     assertBuildResult(
       result,
       """
-      class ServiceProtocolSpy: ServiceProtocol {
+      class StubServiceProtocol: ServiceProtocol {
+          static var shared = StubServiceProtocol()
           var fooTextCountCallsCount = 0
           var fooTextCountCalled: Bool {
               return fooTextCountCallsCount > 0
           }
           var fooTextCountReceivedArguments: (text: String, count: Int)?
           var fooTextCountReceivedInvocations: [(text: String, count: Int)] = []
-          var fooTextCountReturnValue: Decimal!
+          var stubbedFooTextCount: Decimal!
           var fooTextCountClosure: ((String, Int) async -> Decimal)?
           func foo(text: String, count: Int) async -> Decimal {
               fooTextCountCallsCount += 1
@@ -154,7 +159,7 @@ final class UT_SpyFactory: XCTestCase {
               if fooTextCountClosure != nil {
                   return await fooTextCountClosure!(text, count)
               } else {
-                  return fooTextCountReturnValue
+                  return stubbedFooTextCount
               }
           }
       }
@@ -172,12 +177,13 @@ final class UT_SpyFactory: XCTestCase {
     )
     let protocolDeclaration = try XCTUnwrap(ProtocolDeclSyntax(declaration))
 
-    let result = try SpyFactory().classDeclaration(for: protocolDeclaration)
+    let result = try StubFactory().classDeclaration(for: protocolDeclaration)
 
     assertBuildResult(
       result,
       """
-      class ServiceProtocolSpy: ServiceProtocol {
+      class StubServiceProtocol: ServiceProtocol {
+          static var shared = StubServiceProtocol()
           var fooCallsCount = 0
           var fooCalled: Bool {
               return fooCallsCount > 0
@@ -185,7 +191,7 @@ final class UT_SpyFactory: XCTestCase {
           var fooReceivedAdded: ((text: String) -> Void)?
           var fooReceivedInvocations: [((text: String) -> Void)?] = []
           var fooThrowableError: (any Error)?
-          var fooReturnValue: (() -> Int)?
+          var stubbedFoo: (() -> Int)?
           var fooClosure: ((((text: String) -> Void)?) throws -> (() -> Int)?)?
           func foo(_ added: ((text: String) -> Void)?) throws -> (() -> Int)? {
               fooCallsCount += 1
@@ -197,7 +203,7 @@ final class UT_SpyFactory: XCTestCase {
               if fooClosure != nil {
                   return try fooClosure!(added)
               } else {
-                  return fooReturnValue
+                  return stubbedFoo
               }
           }
       }
@@ -215,43 +221,22 @@ final class UT_SpyFactory: XCTestCase {
     )
     let protocolDeclaration = try XCTUnwrap(ProtocolDeclSyntax(declaration))
 
-    let result = try SpyFactory().classDeclaration(for: protocolDeclaration)
+    let result = try StubFactory().classDeclaration(for: protocolDeclaration)
 
     assertBuildResult(
       result,
       """
-      class ServiceProtocolSpy: ServiceProtocol {
+      class StubServiceProtocol: ServiceProtocol {
+          static var shared = StubServiceProtocol()
           var data: Data {
               get {
-                  underlyingData
+                  stubbedData
               }
               set {
-                  underlyingData = newValue
+                  stubbedData = newValue
               }
           }
-          var underlyingData: (Data)!
-      }
-      """
-    )
-  }
-
-  func testDeclarationOptionalVariable() throws {
-    let declaration = DeclSyntax(
-      """
-      protocol ServiceProtocol {
-          var data: Data? { get set }
-      }
-      """
-    )
-    let protocolDeclaration = try XCTUnwrap(ProtocolDeclSyntax(declaration))
-
-    let result = try SpyFactory().classDeclaration(for: protocolDeclaration)
-
-    assertBuildResult(
-      result,
-      """
-      class ServiceProtocolSpy: ServiceProtocol {
-          var data: Data?
+          var stubbedData: (Data)!
       }
       """
     )
@@ -267,68 +252,22 @@ final class UT_SpyFactory: XCTestCase {
     )
     let protocolDeclaration = try XCTUnwrap(ProtocolDeclSyntax(declaration))
 
-    let result = try SpyFactory().classDeclaration(for: protocolDeclaration)
+    let result = try StubFactory().classDeclaration(for: protocolDeclaration)
 
     assertBuildResult(
       result,
       """
-      class ServiceProtocolSpy: ServiceProtocol {
+      class StubServiceProtocol: ServiceProtocol {
+          static var shared = StubServiceProtocol()
           var completion: () -> Void {
               get {
-                  underlyingCompletion
+                  stubbedCompletion
               }
               set {
-                  underlyingCompletion = newValue
+                  stubbedCompletion = newValue
               }
           }
-          var underlyingCompletion: (() -> Void)!
-      }
-      """
-    )
-  }
-}
-
-// - MARK: Handle Protocol Associated types
-
-extension UT_SpyFactory {
-  func testDeclarationAssociatedtype() throws {
-    let declaration = DeclSyntax(
-      """
-      protocol Foo {
-          associatedtype Key: Hashable
-      }
-      """
-    )
-    let protocolDeclaration = try XCTUnwrap(ProtocolDeclSyntax(declaration))
-
-    let result = try SpyFactory().classDeclaration(for: protocolDeclaration)
-
-    assertBuildResult(
-      result,
-      """
-      class FooSpy<Key: Hashable>: Foo {
-      }
-      """
-    )
-  }
-
-  func testDeclarationAssociatedtypeKeyValue() throws {
-    let declaration = DeclSyntax(
-      """
-      protocol Foo {
-          associatedtype Key: Hashable
-          associatedtype Value
-      }
-      """
-    )
-    let protocolDeclaration = try XCTUnwrap(ProtocolDeclSyntax(declaration))
-
-    let result = try SpyFactory().classDeclaration(for: protocolDeclaration)
-
-    assertBuildResult(
-      result,
-      """
-      class FooSpy<Key: Hashable, Value>: Foo {
+          var stubbedCompletion: (() -> Void)!
       }
       """
     )

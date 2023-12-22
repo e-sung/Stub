@@ -1,7 +1,7 @@
 import SwiftSyntax
 import XCTest
 
-@testable import SpyableMacro
+@testable import StubMacro
 
 final class UT_FunctionImplementationFactory: XCTestCase {
   func testDeclaration() throws {
@@ -72,7 +72,7 @@ final class UT_FunctionImplementationFactory: XCTestCase {
           if funcNameClosure != nil {
               return funcNameClosure!()
           } else {
-              return funcNameReturnValue
+              return stubbedFuncName
           }
       }
       """
@@ -104,7 +104,7 @@ final class UT_FunctionImplementationFactory: XCTestCase {
           if fooClosure != nil {
               return try await fooClosure!(bar)
           } else {
-              return fooReturnValue
+              return stubbedFoo
           }
       }
       """

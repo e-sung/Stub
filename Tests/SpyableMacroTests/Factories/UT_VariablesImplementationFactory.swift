@@ -1,7 +1,7 @@
 import SwiftSyntax
 import XCTest
 
-@testable import SpyableMacro
+@testable import StubMacro
 
 final class UT_VariablesImplementationFactory: XCTestCase {
   func testVariablesDeclarations() throws {
@@ -18,13 +18,13 @@ final class UT_VariablesImplementationFactory: XCTestCase {
       """
       var point: (x: Int, y: Int?, (Int, Int)) {
           get {
-              underlyingPoint
+              stubbedPoint
           }
           set {
-              underlyingPoint = newValue
+              stubbedPoint = newValue
           }
       }
-      var underlyingPoint: ((x: Int, y: Int?, (Int, Int)))!
+      var stubbedPoint: ((x: Int, y: Int?, (Int, Int)))!
       """
     )
   }
@@ -60,13 +60,13 @@ final class UT_VariablesImplementationFactory: XCTestCase {
       """
       var completion: () -> Void {
           get {
-              underlyingCompletion
+              stubbedCompletion
           }
           set {
-              underlyingCompletion = newValue
+              stubbedCompletion = newValue
           }
       }
-      var underlyingCompletion: (() -> Void)!
+      var stubbedCompletion: (() -> Void)!
       """
     )
   }
@@ -81,7 +81,7 @@ final class UT_VariablesImplementationFactory: XCTestCase {
         protocolVariableDeclaration: protocolVariableDeclaration)
     ) { error in
       XCTAssertEqual(
-        error as! SpyableDiagnostic, SpyableDiagnostic.variableDeclInProtocolWithNotSingleBinding)
+        error as! StubDiagnostic, StubDiagnostic.variableDeclInProtocolWithNotSingleBinding)
     }
   }
 
@@ -95,8 +95,8 @@ final class UT_VariablesImplementationFactory: XCTestCase {
         protocolVariableDeclaration: protocolVariableDeclaration)
     ) { error in
       XCTAssertEqual(
-        error as! SpyableDiagnostic,
-        SpyableDiagnostic.variableDeclInProtocolWithNotIdentifierPattern)
+        error as! StubDiagnostic,
+        StubDiagnostic.variableDeclInProtocolWithNotIdentifierPattern)
     }
   }
 }

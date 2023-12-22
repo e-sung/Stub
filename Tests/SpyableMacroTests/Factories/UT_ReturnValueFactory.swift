@@ -1,7 +1,7 @@
 import SwiftSyntax
 import XCTest
 
-@testable import SpyableMacro
+@testable import StubMacro
 
 final class UT_ReturnValueFactory: XCTestCase {
   func testVariableDeclaration() throws {
@@ -16,7 +16,7 @@ final class UT_ReturnValueFactory: XCTestCase {
     assertBuildResult(
       result,
       """
-      var function_nameReturnValue: (text: String, count: UInt)!
+      var stubbedFunction_name: (text: String, count: UInt)!
       """
     )
   }
@@ -33,20 +33,20 @@ final class UT_ReturnValueFactory: XCTestCase {
     assertBuildResult(
       result,
       """
-      var functionNameReturnValue: String?
+      var stubbedFunctionName: String?
       """
     )
   }
 
   func testReturnStatement() {
-    let variablePrefix = "function_name"
+    let variablePrefix = "functionName"
 
     let result = ReturnValueFactory().returnStatement(variablePrefix: variablePrefix)
 
     assertBuildResult(
       result,
       """
-      return function_nameReturnValue
+      return stubbedFunctionName
       """
     )
   }

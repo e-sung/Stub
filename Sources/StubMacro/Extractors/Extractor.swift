@@ -7,13 +7,13 @@ import SwiftSyntax
 /// attempts to cast the input `DeclSyntaxProtocol` into a `ProtocolDeclSyntax`.
 /// If the cast is successful, the method returns the `ProtocolDeclSyntax`. If the cast fails,
 /// meaning the input declaration is not a protocol declaration, the method throws
-/// a `SpyableDiagnostic.onlyApplicableToProtocol` error.
+/// a `StubDiagnostic.onlyApplicableToProtocol` error.
 struct Extractor {
   func extractProtocolDeclaration(
     from declaration: DeclSyntaxProtocol
   ) throws -> ProtocolDeclSyntax {
     guard let protocolDeclaration = declaration.as(ProtocolDeclSyntax.self) else {
-      throw SpyableDiagnostic.onlyApplicableToProtocol
+      throw StubDiagnostic.onlyApplicableToProtocol
     }
 
     return protocolDeclaration

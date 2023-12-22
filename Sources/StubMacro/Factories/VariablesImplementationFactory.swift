@@ -7,13 +7,13 @@ import SwiftSyntaxBuilder
 /// It takes a `VariableDeclSyntax` instance from a protocol as input and generates two kinds
 /// of variable declarations for non-optional type variables:
 /// 1. A variable declaration that is a copy of the protocol variable, but with explicit getter and setter
-/// accessors that link it to an underlying variable.
-/// 2. A variable declaration for the underlying variable that is used in the getter and setter of the protocol variable.
+/// accessors that link it to an stubbed variable.
+/// 2. A variable declaration for the stubbed variable that is used in the getter and setter of the protocol variable.
 ///
 /// For optional type variables, the factory simply returns the original variable declaration without accessors.
 ///
-/// The name of the underlying variable is created by appending the name of the protocol variable to the word "underlying",
-/// with the first character of the protocol variable name capitalized. The type of the underlying variable is always
+/// The name of the stubbed variable is created by appending the name of the protocol variable to the word "stubbed",
+/// with the first character of the protocol variable name capitalized. The type of the stubbed variable is always
 /// implicitly unwrapped optional to handle the non-optional protocol variables.
 ///
 /// For example, given a non-optional protocol variable:
@@ -23,10 +23,10 @@ import SwiftSyntaxBuilder
 /// the `VariablesImplementationFactory` generates the following declarations:
 /// ```swift
 /// var text: String {
-///     get { underlyingText }
-///     set { underlyingText = newValue }
+///     get { stubbedText }
+///     set { stubbedText = newValue }
 /// }
-/// var underlyingText: String!
+/// var stubbedText: String!
 /// ```
 /// And for an optional protocol variable:
 /// ```swift
@@ -58,11 +58,11 @@ struct VariablesImplementationFactory {
       } else {
         try protocolVariableDeclarationWithGetterAndSetter(binding: binding)
 
-        try underlyingVariableDeclaration(binding: binding)
+        try stubbedVariableDeclaration(binding: binding)
       }
     } else {
       // As far as I know variable declaration in a protocol should have exactly one binding.
-      throw SpyableDiagnostic.variableDeclInProtocolWithNotSingleBinding
+      throw StubDiagnostic.variableDeclInProtocolWithNotSingleBinding
     }
   }
 
@@ -72,32 +72,32 @@ struct VariablesImplementationFactory {
     try VariableDeclSyntax(
       """
       var \(binding.pattern.trimmed)\(binding.typeAnnotation!.trimmed) {
-          get { \(raw: underlyingVariableName(binding: binding)) }
-          set { \(raw: underlyingVariableName(binding: binding)) = newValue }
+          get { \(raw: stubbedVariableName(binding: binding)) }
+          set { \(raw: stubbedVariableName(binding: binding)) = newValue }
       }
       """
     )
   }
 
-  private func underlyingVariableDeclaration(
+  private func stubbedVariableDeclaration(
     binding: PatternBindingListSyntax.Element
   ) throws -> VariableDeclSyntax {
     try VariableDeclSyntax(
       """
-      var \(raw: underlyingVariableName(binding: binding)): (\(binding.typeAnnotation!.type.trimmed))!
+      var \(raw: stubbedVariableName(binding: binding)): (\(binding.typeAnnotation!.type.trimmed))!
       """
     )
   }
 
-  private func underlyingVariableName(binding: PatternBindingListSyntax.Element) throws -> String {
+  private func stubbedVariableName(binding: PatternBindingListSyntax.Element) throws -> String {
     guard let identifierPattern = binding.pattern.as(IdentifierPatternSyntax.self) else {
       // As far as I know variable declaration in a protocol should have identifier pattern
-      throw SpyableDiagnostic.variableDeclInProtocolWithNotIdentifierPattern
+      throw StubDiagnostic.variableDeclInProtocolWithNotIdentifierPattern
     }
 
     let identifierText = identifierPattern.identifier.text
 
-    return "underlying" + identifierText.prefix(1).uppercased() + identifierText.dropFirst()
+    return "stubbed" + identifierText.prefix(1).uppercased() + identifierText.dropFirst()
   }
 }
 
