@@ -103,7 +103,7 @@ final class UT_SpyableMacro: XCTestCase {
                 return fetchConfigCallsCount > 0
             }
             var fetchConfigThrowableError: (any Error)?
-            var stubbedFetchConfig: [String: String]!
+            var stubbedFetchConfigResult: [String: String]!
             var fetchConfigClosure: (() async throws -> [String: String])?
                 func fetchConfig() async throws -> [String: String] {
                 fetchConfigCallsCount += 1
@@ -113,7 +113,7 @@ final class UT_SpyableMacro: XCTestCase {
                 if fetchConfigClosure != nil {
                     return try await fetchConfigClosure!()
                 } else {
-                    return stubbedFetchConfig
+                    return stubbedFetchConfigResult
                 }
             }
             var fetchDataCallsCount = 0
@@ -122,7 +122,7 @@ final class UT_SpyableMacro: XCTestCase {
             }
             var fetchDataReceivedName: (String, count: Int)?
             var fetchDataReceivedInvocations: [(String, count: Int)] = []
-            var stubbedFetchData: (() -> Void)!
+            var stubbedFetchDataResult: (() -> Void)!
             var fetchDataClosure: (((String, count: Int)) async -> (() -> Void))?
                 func fetchData(_ name: (String, count: Int)) async -> (() -> Void) {
                 fetchDataCallsCount += 1
@@ -131,7 +131,7 @@ final class UT_SpyableMacro: XCTestCase {
                 if fetchDataClosure != nil {
                     return await fetchDataClosure!(name)
                 } else {
-                    return stubbedFetchData
+                    return stubbedFetchDataResult
                 }
             }
         }

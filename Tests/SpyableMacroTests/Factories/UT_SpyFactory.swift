@@ -112,14 +112,14 @@ final class UT_StubFactory: XCTestCase {
           var printCalled: Bool {
               return printCallsCount > 0
           }
-          var stubbedPrint: (text: String, tuple: (count: Int?, Date))!
+          var stubbedPrintResult: (text: String, tuple: (count: Int?, Date))!
           var printClosure: (() -> (text: String, tuple: (count: Int?, Date)))?
           func print() -> (text: String, tuple: (count: Int?, Date)) {
               printCallsCount += 1
               if printClosure != nil {
                   return printClosure!()
               } else {
-                  return stubbedPrint
+                  return stubbedPrintResult
               }
           }
       }
@@ -150,7 +150,7 @@ final class UT_StubFactory: XCTestCase {
           }
           var fooTextCountReceivedArguments: (text: String, count: Int)?
           var fooTextCountReceivedInvocations: [(text: String, count: Int)] = []
-          var stubbedFooTextCount: Decimal!
+          var stubbedFooTextCountResult: Decimal!
           var fooTextCountClosure: ((String, Int) async -> Decimal)?
           func foo(text: String, count: Int) async -> Decimal {
               fooTextCountCallsCount += 1
@@ -159,7 +159,7 @@ final class UT_StubFactory: XCTestCase {
               if fooTextCountClosure != nil {
                   return await fooTextCountClosure!(text, count)
               } else {
-                  return stubbedFooTextCount
+                  return stubbedFooTextCountResult
               }
           }
       }
@@ -191,7 +191,7 @@ final class UT_StubFactory: XCTestCase {
           var fooReceivedAdded: ((text: String) -> Void)?
           var fooReceivedInvocations: [((text: String) -> Void)?] = []
           var fooThrowableError: (any Error)?
-          var stubbedFoo: (() -> Int)?
+          var stubbedFooResult: (() -> Int)?
           var fooClosure: ((((text: String) -> Void)?) throws -> (() -> Int)?)?
           func foo(_ added: ((text: String) -> Void)?) throws -> (() -> Int)? {
               fooCallsCount += 1
@@ -203,7 +203,7 @@ final class UT_StubFactory: XCTestCase {
               if fooClosure != nil {
                   return try fooClosure!(added)
               } else {
-                  return stubbedFoo
+                  return stubbedFooResult
               }
           }
       }

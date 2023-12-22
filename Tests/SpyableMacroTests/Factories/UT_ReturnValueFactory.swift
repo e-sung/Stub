@@ -16,7 +16,7 @@ final class UT_ReturnValueFactory: XCTestCase {
     assertBuildResult(
       result,
       """
-      var stubbedFunction_name: (text: String, count: UInt)!
+      var stubbedFunction_nameResult: (text: String, count: UInt)!
       """
     )
   }
@@ -33,7 +33,7 @@ final class UT_ReturnValueFactory: XCTestCase {
     assertBuildResult(
       result,
       """
-      var stubbedFunctionName: String?
+      var stubbedFunctionNameResult: String?
       """
     )
   }
@@ -46,7 +46,7 @@ final class UT_ReturnValueFactory: XCTestCase {
     assertBuildResult(
       result,
       """
-      return stubbedFunctionName
+      return stubbedFunctionNameResult
       """
     )
   }

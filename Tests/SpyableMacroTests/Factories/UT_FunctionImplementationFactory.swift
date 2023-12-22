@@ -72,7 +72,7 @@ final class UT_FunctionImplementationFactory: XCTestCase {
           if funcNameClosure != nil {
               return funcNameClosure!()
           } else {
-              return stubbedFuncName
+              return stubbedFuncNameResult
           }
       }
       """
@@ -104,7 +104,7 @@ final class UT_FunctionImplementationFactory: XCTestCase {
           if fooClosure != nil {
               return try await fooClosure!(bar)
           } else {
-              return stubbedFoo
+              return stubbedFooResult
           }
       }
       """
