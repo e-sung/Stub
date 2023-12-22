@@ -1,13 +1,13 @@
 import SwiftDiagnostics
 
-/// `SpyableDiagnostic` is an enumeration defining specific error messages related to the Spyable system.
+/// `StubDiagnostic` is an enumeration defining specific error messages related to the Stub system.
 ///
 /// It conforms to the `DiagnosticMessage` and `Error` protocols to provide comprehensive error information
 /// and integrate smoothly with error handling mechanisms.
 ///
-/// - Note: The `SpyableDiagnostic` enum can be expanded to include more diagnostic cases as
-///         the Spyable system grows and needs to handle more error types.
-enum SpyableDiagnostic: String, DiagnosticMessage, Error {
+/// - Note: The `StubDiagnostic` enum can be expanded to include more diagnostic cases as
+///         the Stub system grows and needs to handle more error types.
+enum StubDiagnostic: String, DiagnosticMessage, Error {
   case onlyApplicableToProtocol
   case variableDeclInProtocolWithNotSingleBinding
   case variableDeclInProtocolWithNotIdentifierPattern
@@ -15,11 +15,11 @@ enum SpyableDiagnostic: String, DiagnosticMessage, Error {
   var message: String {
     switch self {
     case .onlyApplicableToProtocol:
-      "'@Spyable' can only be applied to a 'protocol'"
+      "'@Stub' can only be applied to a 'protocol'"
     case .variableDeclInProtocolWithNotSingleBinding:
-      "Variable declaration in a 'protocol' with the '@Spyable' attribute must have exactly one binding"
+      "Variable declaration in a 'protocol' with the '@Stub' attribute must have exactly one binding"
     case .variableDeclInProtocolWithNotIdentifierPattern:
-      "Variable declaration in a 'protocol' with the '@Spyable' attribute must have identifier pattern"
+      "Variable declaration in a 'protocol' with the '@Stub' attribute must have identifier pattern"
     }
   }
 
@@ -32,6 +32,6 @@ enum SpyableDiagnostic: String, DiagnosticMessage, Error {
   }
 
   var diagnosticID: MessageID {
-    MessageID(domain: "SpyableMacro", id: rawValue)
+    MessageID(domain: "StubMacro", id: rawValue)
   }
 }

@@ -1,7 +1,7 @@
 import SwiftSyntax
 import XCTest
 
-@testable import SpyableMacro
+@testable import StubMacro
 
 final class UT_CallsCountFactory: XCTestCase {
   func testVariableDeclaration() throws {

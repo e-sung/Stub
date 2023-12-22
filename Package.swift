@@ -4,7 +4,7 @@ import CompilerPluginSupport
 import PackageDescription
 
 let package = Package(
-  name: "swift-spyable",
+  name: "Stub",
   platforms: [
     .macOS(.v10_15),
     .iOS(.v13),
@@ -14,8 +14,8 @@ let package = Package(
   ],
   products: [
     .library(
-      name: "Spyable",
-      targets: ["Spyable"]
+      name: "Stub",
+      targets: ["Stub"]
     )
   ],
   dependencies: [
@@ -26,22 +26,22 @@ let package = Package(
   ],
   targets: [
     .macro(
-      name: "SpyableMacro",
+      name: "StubMacro",
       dependencies: [
         .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
         .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
       ]
     ),
     .target(
-      name: "Spyable",
+      name: "Stub",
       dependencies: [
-        "SpyableMacro"
+        "StubMacro"
       ]
     ),
     .testTarget(
-      name: "SpyableMacroTests",
+      name: "StubMacroTests",
       dependencies: [
-        "SpyableMacro",
+        "StubMacro",
         .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
       ]
     ),

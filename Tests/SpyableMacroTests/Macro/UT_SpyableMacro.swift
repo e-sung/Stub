@@ -2,10 +2,10 @@ import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
 import XCTest
 
-@testable import SpyableMacro
+@testable import StubMacro
 
 final class UT_SpyableMacro: XCTestCase {
-  private let sut = ["Spyable": SpyableMacro.self]
+  private let sut = ["Stub": StubMacro.self]
 
   func testMacro() {
     let protocolDeclaration = """
@@ -38,42 +38,43 @@ final class UT_SpyableMacro: XCTestCase {
 
     assertMacroExpansion(
       """
-      @Spyable
+      @Stub
       \(protocolDeclaration)
       """,
       expandedSource: """
 
         \(protocolDeclaration)
 
-        class ServiceProtocolSpy: ServiceProtocol {
+        class StubServiceProtocol: ServiceProtocol {
+            static var shared = StubServiceProtocol()
             var name: String {
                 get {
-                    underlyingName
+                    stubbedName
                 }
                 set {
-                    underlyingName = newValue
+                    stubbedName = newValue
                 }
             }
-            var underlyingName: (String)!
+            var stubbedName: (String)!
             var anyProtocol: any Codable {
                 get {
-                    underlyingAnyProtocol
+                    stubbedAnyProtocol
                 }
                 set {
-                    underlyingAnyProtocol = newValue
+                    stubbedAnyProtocol = newValue
                 }
             }
-            var underlyingAnyProtocol: (any Codable)!
+            var stubbedAnyProtocol: (any Codable)!
                 var secondName: String?
             var added: () -> Void {
                 get {
-                    underlyingAdded
+                    stubbedAdded
                 }
                 set {
-                    underlyingAdded = newValue
+                    stubbedAdded = newValue
                 }
             }
-            var underlyingAdded: (() -> Void)!
+            var stubbedAdded: (() -> Void)!
                 var removed: (() -> Void)?
             var logoutCallsCount = 0
             var logoutCalled: Bool {
@@ -102,7 +103,7 @@ final class UT_SpyableMacro: XCTestCase {
                 return fetchConfigCallsCount > 0
             }
             var fetchConfigThrowableError: (any Error)?
-            var fetchConfigReturnValue: [String: String]!
+            var stubbedFetchConfig: [String: String]!
             var fetchConfigClosure: (() async throws -> [String: String])?
                 func fetchConfig() async throws -> [String: String] {
                 fetchConfigCallsCount += 1
@@ -112,7 +113,7 @@ final class UT_SpyableMacro: XCTestCase {
                 if fetchConfigClosure != nil {
                     return try await fetchConfigClosure!()
                 } else {
-                    return fetchConfigReturnValue
+                    return stubbedFetchConfig
                 }
             }
             var fetchDataCallsCount = 0
@@ -121,7 +122,7 @@ final class UT_SpyableMacro: XCTestCase {
             }
             var fetchDataReceivedName: (String, count: Int)?
             var fetchDataReceivedInvocations: [(String, count: Int)] = []
-            var fetchDataReturnValue: (() -> Void)!
+            var stubbedFetchData: (() -> Void)!
             var fetchDataClosure: (((String, count: Int)) async -> (() -> Void))?
                 func fetchData(_ name: (String, count: Int)) async -> (() -> Void) {
                 fetchDataCallsCount += 1
@@ -130,35 +131,10 @@ final class UT_SpyableMacro: XCTestCase {
                 if fetchDataClosure != nil {
                     return await fetchDataClosure!(name)
                 } else {
-                    return fetchDataReturnValue
+                    return stubbedFetchData
                 }
             }
         }
-        """,
-      macros: sut
-    )
-  }
-
-  func testMacroWithFlag() {
-    let protocolDeclaration = """
-      public protocol ServiceProtocol {
-          var variable: Bool? { get set }
-      }
-      """
-    assertMacroExpansion(
-      """
-      @Spyable(behindPreprocessorFlag: "CUSTOM")
-      \(protocolDeclaration)
-      """,
-      expandedSource: """
-
-        \(protocolDeclaration)
-
-        #if CUSTOM
-        class ServiceProtocolSpy: ServiceProtocol {
-            var variable: Bool?
-        }
-        #endif
         """,
       macros: sut
     )

@@ -5,7 +5,7 @@
   @main
   struct SpyableCompilerPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
-      SpyableMacro.self
+      StubMacro.self
     ]
   }
 #endif

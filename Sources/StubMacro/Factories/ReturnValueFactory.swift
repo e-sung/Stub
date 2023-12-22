@@ -67,6 +67,11 @@ struct ReturnValueFactory {
   }
 
   private func variableIdentifier(variablePrefix: String) -> TokenSyntax {
-    TokenSyntax.identifier(variablePrefix + "ReturnValue")
+      TokenSyntax.identifier("stubbed" + variablePrefix.capitalizeFirst())
   }
+}
+fileprivate extension String {
+    func capitalizeFirst() -> String {
+        return prefix(1).capitalized + dropFirst()
+    }
 }
