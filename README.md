@@ -1,6 +1,6 @@
 # Stub
 
-This is a fork project of [swift-spyable](https://github.com/Matejkob/swift-spyable) to use same functionality, but with different interface names, only to support backward compatibility of my existing project
+> This is a fork project of [swift-spyable](https://github.com/Matejkob/swift-spyable) to use same functionality, but with different interface names, only to support backward compatibility of my existing project
 
 A powerful tool for Swift that simplifies and automates the process of creating spies
 for testing. Using the `@Stub` annotation on a protocol, the macro generates
